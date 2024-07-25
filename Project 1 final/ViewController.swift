@@ -20,19 +20,21 @@ class ViewController: UITableViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         
         
-        let fm = FileManager.default
-        let path = Bundle.main.resourcePath!
-        // Gh
-        if let items = try? fm.contentsOfDirectory(atPath: path) {
-                    pictures = items.filter { $0.hasPrefix("nssl") }
-
-                    pictures.sort { $0.localizedStandardCompare($1) == .orderedAscending }
-                }
-
-                print(pictures)
+        DispatchQueue.global(qos: .userInitiated).async {
+            let fm = FileManager.default
+            let path = Bundle.main.resourcePath!
+            if let items = try? fm.contentsOfDirectory(atPath: path) {
+                self.pictures = items.filter { $0.hasPrefix("nssl") }
+                self.pictures.sort { $0.localizedStandardCompare($1) == .orderedAscending }
             }
-            //
-       
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+            print(self.pictures)
+        }
+            }
+
+
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return pictures.count
